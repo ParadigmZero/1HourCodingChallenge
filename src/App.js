@@ -1,20 +1,30 @@
 import logo from './logo.svg';
 import './App.css';
+import { useEffect, useState } from "react";
+import useFetch from './libs/useFetch';
+import { UseAppContext } from './appContext';
 
 function App() {
 
-  const people = [
-    { name: 'Alice', age: 20 }
-    ,
-    { name: 'Bob', age: 25 }
-    ,
-    { name: 'Carol', age: 30 }
-    ,
-    { name: 'Dave', age: 35 }
-  ];
+  useFetch();
+
+  const { people, setPeople, refreshSwitch, setRefreshSwitch } = UseAppContext();
+
+  // for controlled components
+  const [name, setName] = useState("");
+  const [age, setAge] = useState("");
+
+
 
   return (
     <>
+      Name<input value={name} onChange={(event) => setName(event.target.value)}></input>
+      Age<input value={age} onChange={(event) => setAge(event.target.value)}></input>
+      <br />
+      <button onClick={addUser}>submit</button>
+
+      <br /><br />
+
       <ul>
 
 
@@ -30,20 +40,20 @@ function App() {
       </ul>
 
       <br />
-      Youngest:
+  Youngest:
       <br />
-      {getYoungest()}
+      { getYoungest()}
       <br />
       <br />
-      Oldest:
+  Oldest:
       <br />
-      {getOldest()}
+      { getOldest()}
 
       <br />
       <br />
-      Average age:
+  Average age:
       <br />
-      {averageAge()}
+      { averageAge()}
 
 
     </>
@@ -88,6 +98,35 @@ function App() {
     return `${youngest.name} - ${youngest.age}`;
 
   }
+
+  function addUser() {
+    console.log("user added");
+
+    const person = {
+      name: name,
+      age: age
+    };
+
+    postPerson("POST", person);
+
+  }
+
+  async function postPerson(method, body) {
+    let data = await fetch(`http://localhost:5000/person`, {
+      method,
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify(body),
+    });
+
+    setRefreshSwitch(!refreshSwitch);
+
+
+    setName("");
+    setAge("");
+  }
+
+
+
 
 
 }
